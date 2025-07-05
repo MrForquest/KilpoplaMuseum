@@ -1,33 +1,30 @@
-import re
+from PyQt5.QtGui import QPixmap
 
 
 class MuseumImage:
-    def __init__(self, filename, pixmap, default_opacity):
-        self.filename = filename
+    def __init__(self, path: str, layer_name: str) -> None:
+        self.path = path
+        self.pixmap = None
+        self.layer_name = layer_name
+
+    def load_image(self):
+        pixmap = QPixmap(self.path)
         self.pixmap = pixmap
-        self.filename = filename
-        self.default_opacity = default_opacity
-        self.current_opacity = default_opacity
-        pattern = r"image_(?P<index>\d+)*"
-        match = re.match(pattern, filename)
-        ## todo refactoring
-        assert match, "Wrong filename of image"
-        self.index = int(match.group("index"))
 
-    def set_opacity(self, opacity):
-        self.current_opacity = opacity
-
-    def get_opacity(self):
-        return self.current_opacity
-
-    def get_default_opacity(self):
-        return self.default_opacity
-
-    def get_pixmap(self):
+    def get_pixmap(self) -> QPixmap:
         return self.pixmap
 
-    def get_index(self):
-        return self.index
 
-# class LayersPreset:
-#     def __init__(self, ):
+class LayersPreset:
+    def __init__(self,
+                 layer_params: dict[str, tuple[int, float]],
+                 ) -> None:
+        layer_order = dict()
+        self.layers = sorted(layer_order.keys(), key=lambda k: layer_order[k])
+        self.layer_default_opacities = dict()
+        self.layer_current_opacities = dict()
+        for key, values in layer_params.items():
+            self.layer_default_opacities[key] = values[1]
+            self.layer_current_opacities[key] = values[1]
+            layer_order[key] = values[0]
+        self.layers = sorted(layer_order.keys(), key=lambda k: layer_order[k])
