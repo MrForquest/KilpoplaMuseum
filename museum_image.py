@@ -1,4 +1,5 @@
 from PyQt5.QtGui import QPixmap
+from PyQt5.QtCore import Qt, QSize
 
 
 class MuseumImage:
@@ -7,8 +8,10 @@ class MuseumImage:
         self.pixmap = None
         self.layer_name = layer_name
 
-    def load_image(self):
+    def load_image(self, size: QSize):
         pixmap = QPixmap(self.path)
+        pixmap = pixmap.scaled(size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+
         self.pixmap = pixmap
 
     def get_pixmap(self) -> QPixmap:

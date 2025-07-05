@@ -6,7 +6,7 @@ from typing import List, Dict
 
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtGui import QPixmap, QPainter, QKeyEvent
-from PyQt5.QtCore import Qt, QTimer, QVariantAnimation
+from PyQt5.QtCore import Qt, QTimer, QVariantAnimation, QSize
 
 from arduino_connection import ArduinoConnection
 from museum_image import MuseumImage, LayersPreset
@@ -38,9 +38,9 @@ PORT_NAME: str = "/dev/ttyUSB0"
 ard_device: ArduinoConnection = ArduinoConnection(PORT_NAME, 9600)
 
 
-def load_qpixmap(imgs: List[MuseumImage]) -> None:
+def load_qpixmap(size: QSize, imgs: List[MuseumImage]) -> None:
     for img in imgs:
-        img.load_image()
+        img.load_image(size)
 
 
 class MainWindow(QMainWindow):
@@ -63,7 +63,7 @@ class MainWindow(QMainWindow):
         self.current_index = 0
         self.next_index = 0
 
-        load_qpixmap(IMAGES)
+        load_qpixmap(self.size(), IMAGES)
 
         self.current_preset = PRESETS[self.current_index]
         self.next_preset = PRESETS[self.current_index]
@@ -109,6 +109,7 @@ class MainWindow(QMainWindow):
             m_img: MuseumImage = IMGS_DICT[layer_name]
             painter.setOpacity(self.current_preset.layer_current_opacities[layer_name])
             pixmap: QPixmap = m_img.get_pixmap()
+
             x: int = (self.width() - pixmap.width()) // 2
             y: int = (self.height() - pixmap.height()) // 2
             painter.drawPixmap(x, y, pixmap)
