@@ -1,6 +1,5 @@
 import os
 import sys
-import re
 import time
 from typing import List, Dict
 
@@ -8,8 +7,8 @@ from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtGui import QPixmap, QPainter, QKeyEvent
 from PyQt5.QtCore import Qt, QTimer, QVariantAnimation, QSize
 
-from arduino_connection import ArduinoConnection
-from museum_image import MuseumImage, LayersPreset
+from modules.arduino_connection import ArduinoConnection
+from modules.museum_image import MuseumImage, LayersPreset
 
 # CONFIG
 IMAGE_FOLDER: str = "/home/sergey/PycharmProjects/kilpola_museum/images"
