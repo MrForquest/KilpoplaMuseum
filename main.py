@@ -35,8 +35,7 @@ PRESETS: Dict[int, LayersPreset] = {
 
 PORT_NAME: str = "/dev/ttyUSB0"
 
-
-# ard_device: ArduinoConnection = ArduinoConnection(PORT_NAME, 9600)
+ard_device: ArduinoConnection = ArduinoConnection(PORT_NAME, 9600)
 
 
 def load_qpixmap(imgs: List[MuseumImage]) -> None:
@@ -62,12 +61,12 @@ class MainWindow(QMainWindow):
         self.images = []
         self.states = []
         self.current_index = 0
-        self.next_index = 1
+        self.next_index = 0
 
         load_qpixmap(IMAGES)
 
         self.current_preset = PRESETS[self.current_index]
-        self.next_preset: LayersPreset = PRESETS[self.current_index]
+        self.next_preset = PRESETS[self.current_index]
 
         self.anim = QVariantAnimation(self)
         self.anim.setDuration(1000)
@@ -91,14 +90,13 @@ class MainWindow(QMainWindow):
             #                                                               layer_name]
             self.next_preset.layer_current_opacities[layer_name] = value * self.next_preset.layer_default_opacities[
                 layer_name]
-        print(value)
         self.update()
 
     def on_animation_finished(self) -> None:
-        self.current_index = self.next_index
         for layer_name in self.current_preset.layers:
             self.current_preset.layer_current_opacities[layer_name] = 0.0
             self.next_preset.layer_current_opacities[layer_name] = self.next_preset.layer_default_opacities[layer_name]
+        self.current_index = self.next_index
         self.current_preset = self.next_preset
         self.update()
 
@@ -106,7 +104,7 @@ class MainWindow(QMainWindow):
         # preset: LayersPreset = PRESETS[7]
         painter = QPainter(self)
         painter.setRenderHint(QPainter.SmoothPixmapTransform)
-        print(self.current_preset.layer_current_opacities)
+        # print(self.current_preset.layer_current_opacities)
         for layer_name in self.current_preset.layers:
             m_img: MuseumImage = IMGS_DICT[layer_name]
             painter.setOpacity(self.current_preset.layer_current_opacities[layer_name])
@@ -137,10 +135,21 @@ class MainWindow(QMainWindow):
             self.next_index = (self.current_index + 1) % 8
             self.next_preset = PRESETS[self.next_index]
             # if not self.anim.state() == self.anim.Running:
+            print("aaa")
             self.start_transition()
 
     def on_timer(self) -> None:
-        pass
+        start = time.time()
+        data = int.from_bytes(ard_device.read())
+        if data:  # todo обработка data=0 (напрмиер, смена 0 на -1 на Arduino)
+            print(data)
+            self.next_index = data
+            self.next_preset = PRESETS[self.next_index]
+            # if not self.anim.state() == self.anim.Running:
+            self.start_transition()
+            # self.update()
+
+        print("Timer tick duration:", round((time.time() - start) * 1000), "ms")
 
 
 if __name__ == "__main__":

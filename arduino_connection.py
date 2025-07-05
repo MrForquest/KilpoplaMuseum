@@ -29,9 +29,6 @@ class ArduinoConnection:
     def read(self, size=1):
         return self.ser.read(size=size)
 
-    def set_timeout(self, size=1):
-        return self.ser.write_timeout()
-
     def readable(self):
         return self.ser.readable()
 
